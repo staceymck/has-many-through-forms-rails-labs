@@ -1,1 +1,43 @@
+<h1><%= @post.title %></h1>
+<p><%= @post.content %></p>
+
+<p>Categories:</p>
+<ul>
+  <% @post.categories.each do |cat| %>
+    <li><%= cat.name %></li>
+  <% end %>
+</ul>
+
+<p>Comments:</p>
+<ul>
+  <% @post.comments.each do |comment| %>
+    <li><%= comment.user.username %> says: <%= comment.content %></li>
+  <% end %>
+</ul>
+
+<p>Users who have commented:</p>
+<ul>
+  <% @post.users.distinct.each do |user| %>
+    <li><%= link_to user.username, user_path(user) %></li>
+  <% end %>
+</ul>
+
+<p>Add a Comment:</p>
+<%= form_for @comment do |f| %>
+  <%= f.label :content, "Content" %><br>
+  <%= f.text_area :content %><br>
+
+  <p>Select or create your username:</p>
+  <%= f.collection_select :user_id, User.all, :id, :username, {include_blank: true} %><br>   <%# creates this html: <select name="comment[user_id]" id="comment_user_id"></select> %>
+  <%= f.fields_for :user, @comment.build_user do |user_fields| %> 
+    <%= f.label "Username: " %><br>   <%# creates this html: <input type="text" name="comment[user_attributes][username]" id="comment_user_attributes_username"> %>
+    <%= user_fields.text_field :username %><br>
+    <%= f.label "Email: " %><br>   
+    <%= user_fields.text_field :email %><br>  <%# creates this html: <input type="text" name="comment[user_attributes][email]" id="comment_user_attributes_email"> %>
+  <% end %>
+
+  <%= f.hidden_field :post_id, value: @post.id %>   <%# creates this html: <input value="1" type="hidden" name="comment[post_id]" id="comment_post_id"> %>
+
+  <%= f.submit %>
+<% end %>
 
